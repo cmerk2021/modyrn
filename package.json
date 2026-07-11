@@ -1,6 +1,6 @@
 {
   "name": "modyrn",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "description": "Dashboard-first moderation for modern Discord communities.",
   "license": "AGPL-3.0-only",
