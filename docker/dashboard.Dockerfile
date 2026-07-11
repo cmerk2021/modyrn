@@ -4,7 +4,7 @@
 # Uses Next.js standalone output.
 # ---------------------------------------------------------------------------
 
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
 # Pin pnpm to the version the repo declares so builds don't pick up an
@@ -24,7 +24,7 @@ COPY --from=pruner /app/out/full/ .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm turbo run build --filter=@modyrn/dashboard
 
-FROM node:20-alpine AS runner
+FROM node:26-alpine AS runner
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app

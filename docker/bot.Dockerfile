@@ -3,7 +3,7 @@
 # Modyrn Bot (discord.js) — multi-stage, multi-arch build
 # ---------------------------------------------------------------------------
 
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
 # Pin pnpm to the version the repo declares so builds don't pick up an
@@ -23,7 +23,7 @@ COPY --from=pruner /app/out/full/ .
 RUN pnpm turbo run build --filter=@modyrn/bot
 RUN pnpm --filter=@modyrn/bot --prod deploy /app/deploy
 
-FROM node:20-alpine AS runner
+FROM node:26-alpine AS runner
 ENV NODE_ENV=production
 WORKDIR /app
 RUN addgroup --system --gid 1001 modyrn \

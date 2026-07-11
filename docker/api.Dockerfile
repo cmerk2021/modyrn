@@ -3,7 +3,7 @@
 # Modyrn API (NestJS) — multi-stage, multi-arch build
 # ---------------------------------------------------------------------------
 
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
 # Pin pnpm to the version the repo declares so builds don't pick up an
@@ -26,7 +26,7 @@ RUN pnpm turbo run build --filter=@modyrn/api
 RUN pnpm --filter=@modyrn/api --prod deploy /app/deploy
 
 # --- Runtime ----------------------------------------------------------------
-FROM node:20-alpine AS runner
+FROM node:26-alpine AS runner
 ENV NODE_ENV=production
 WORKDIR /app
 RUN addgroup --system --gid 1001 modyrn \
