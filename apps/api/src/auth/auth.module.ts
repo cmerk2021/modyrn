@@ -23,11 +23,7 @@ import { DiscordOAuthService } from './discord-oauth.service.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    DiscordOAuthService,
-    { provide: APP_GUARD, useClass: AuthGuard },
-  ],
+  providers: [AuthService, DiscordOAuthService, { provide: APP_GUARD, useClass: AuthGuard }],
   exports: [AuthService, DiscordOAuthService],
 })
 export class AuthModule {}

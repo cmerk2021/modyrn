@@ -18,10 +18,7 @@ export const dashboardRoles = pgTable(
     name: varchar('name', { length: 60 }).notNull(),
     /** Hex color for UI display, e.g. "#5865F2". */
     color: varchar('color', { length: 7 }).notNull().default('#5865F2'),
-    permissions: jsonb('permissions')
-      .$type<(DashboardPermission | '*')[]>()
-      .notNull()
-      .default([]),
+    permissions: jsonb('permissions').$type<(DashboardPermission | '*')[]>().notNull().default([]),
     /** Lower position sorts higher in the UI. */
     position: integer('position').notNull().default(0),
     ...timestamps,

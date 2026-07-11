@@ -18,13 +18,13 @@ export default function LoginPage() {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 opacity-50 [background:radial-gradient(50%_40%_at_50%_20%,color-mix(in_oklch,var(--color-primary)_20%,transparent),transparent)]"
       />
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-lg">
+      <div className="border-border bg-card w-full max-w-sm rounded-2xl border p-8 shadow-lg">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
+          <div className="bg-primary/15 text-primary mb-4 flex size-12 items-center justify-center rounded-xl">
             <ShieldCheck className="size-6" />
           </div>
           <h1 className="text-xl font-semibold">Welcome to Modyrn</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-1.5 text-sm">
             Sign in with Discord to manage your communities.
           </p>
         </div>
@@ -33,7 +33,7 @@ export default function LoginPage() {
           <a href="/api/v1/auth/discord">Continue with Discord</a>
         </Button>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-6 text-center text-xs">
           By continuing you agree to the{' '}
           <Link href="https://github.com/modyrn/modyrn" className="underline underline-offset-2">
             terms

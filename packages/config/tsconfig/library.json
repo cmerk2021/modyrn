@@ -3,8 +3,6 @@
   "extends": "./base.json",
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "moduleResolution": "Bundler"
   }
 }

@@ -1,12 +1,4 @@
-import {
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgTable,
-  timestamp,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { boolean, index, integer, jsonb, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import type { QuarantineTarget } from '@modyrn/shared';
 import { snowflake, timestamps } from './_shared.js';
 import { guilds } from './guilds.js';

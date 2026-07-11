@@ -28,10 +28,10 @@ export function UserMenu({ user }: UserMenuProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex items-center gap-2 rounded-full border border-border bg-card py-1 pl-1 pr-3">
+      <div className="border-border bg-card flex items-center gap-2 rounded-full border py-1 pl-1 pr-3">
         <span
           className={cn(
-            'flex size-7 items-center justify-center overflow-hidden rounded-full bg-primary/15 text-xs font-semibold text-primary',
+            'bg-primary/15 text-primary flex size-7 items-center justify-center overflow-hidden rounded-full text-xs font-semibold',
           )}
         >
           {avatarUrl ? (
@@ -46,7 +46,7 @@ export function UserMenu({ user }: UserMenuProps) {
         type="button"
         onClick={() => void logout()}
         aria-label="Log out"
-        className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        className="text-muted-foreground hover:bg-accent hover:text-foreground flex size-9 items-center justify-center rounded-md transition-colors"
       >
         <LogOut className="size-4" />
       </button>

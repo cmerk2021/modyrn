@@ -18,10 +18,7 @@ import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/overview/stat-card';
 import { StatusPill } from '@/components/overview/status-pill';
 import { ActivityChart, type ActivityPoint } from '@/components/overview/activity-chart';
-import {
-  ModerationTimeline,
-  type TimelineCase,
-} from '@/components/overview/moderation-timeline';
+import { ModerationTimeline, type TimelineCase } from '@/components/overview/moderation-timeline';
 
 interface OverviewResponse {
   metrics: OverviewMetrics;
@@ -60,7 +57,7 @@ export default function OverviewPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold tracking-tight">Overview</h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             A live pulse of your community and platform health.
           </p>
         </div>
@@ -83,18 +80,8 @@ export default function OverviewPage() {
           loading={loading}
           delta={3.2}
         />
-        <StatCard
-          label="Online"
-          icon={Activity}
-          value={metrics?.onlineCount}
-          loading={loading}
-        />
-        <StatCard
-          label="Cases today"
-          icon={Ban}
-          value={metrics?.casesToday}
-          loading={loading}
-        />
+        <StatCard label="Online" icon={Activity} value={metrics?.onlineCount} loading={loading} />
+        <StatCard label="Cases today" icon={Ban} value={metrics?.casesToday} loading={loading} />
         <StatCard
           label="Automod events"
           icon={ShieldAlert}
@@ -117,10 +104,7 @@ export default function OverviewPage() {
           display={metrics ? `${metrics.apiLatencyMs} ms` : undefined}
           loading={loading}
         />
-        <StatusPill
-          label="Database"
-          status={metrics?.databaseStatus ?? HealthStatus.Down}
-        />
+        <StatusPill label="Database" status={metrics?.databaseStatus ?? HealthStatus.Down} />
         <StatusPill label="Redis" status={metrics?.redisStatus ?? HealthStatus.Down} />
       </div>
 
@@ -131,10 +115,10 @@ export default function OverviewPage() {
       </div>
 
       {!loading && !data && (
-        <div className="rounded-xl border border-dashed border-border p-8 text-center">
-          <MessagesSquare className="mx-auto mb-3 size-6 text-muted-foreground" />
+        <div className="border-border rounded-xl border border-dashed p-8 text-center">
+          <MessagesSquare className="text-muted-foreground mx-auto mb-3 size-6" />
           <p className="text-sm font-medium">No data yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-sm">
             Once the bot syncs your server, live metrics will appear here.
           </p>
         </div>

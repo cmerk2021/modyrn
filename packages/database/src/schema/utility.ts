@@ -1,4 +1,12 @@
-import { boolean, index, jsonb, pgTable, primaryKey, timestamp, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  index,
+  jsonb,
+  pgTable,
+  primaryKey,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import type { ManagedMessage, UtilityModule } from '@modyrn/shared';
 import { snowflake, timestamps } from './_shared.js';
 import { guilds } from './guilds.js';

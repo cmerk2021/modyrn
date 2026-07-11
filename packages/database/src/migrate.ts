@@ -19,7 +19,6 @@ export async function runMigrations(connectionString = process.env.DATABASE_URL)
   try {
     const db = drizzle(client);
     await migrate(db, { migrationsFolder });
-    // eslint-disable-next-line no-console
     console.info('[modyrn:db] migrations applied successfully');
   } finally {
     await client.end({ timeout: 5 });

@@ -22,14 +22,14 @@ export function Sidebar({ guildId, guildName, complexityMode }: SidebarProps) {
   const resolve = (href: string) => href.replace(':guildId', guildId);
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
-      <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-border px-5">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary/15 text-primary">
+    <aside className="border-sidebar-border bg-sidebar hidden w-64 shrink-0 flex-col border-r md:flex">
+      <div className="border-sidebar-border flex h-16 items-center gap-2.5 border-b px-5">
+        <div className="bg-primary/15 text-primary flex size-8 items-center justify-center rounded-lg">
           <BrandIcon className="size-5" />
         </div>
         <div className="flex flex-col leading-tight">
           <span className="text-sm font-semibold">Modyrn</span>
-          <span className="max-w-[10rem] truncate text-xs text-muted-foreground">{guildName}</span>
+          <span className="text-muted-foreground max-w-[10rem] truncate text-xs">{guildName}</span>
         </div>
       </div>
 
@@ -42,15 +42,14 @@ export function Sidebar({ guildId, guildName, complexityMode }: SidebarProps) {
 
           return (
             <div key={section.title}>
-              <p className="px-3 pb-2 text-[0.7rem] font-medium uppercase tracking-wider text-muted-foreground/70">
+              <p className="text-muted-foreground/70 px-3 pb-2 text-[0.7rem] font-medium uppercase tracking-wider">
                 {section.title}
               </p>
               <ul className="space-y-0.5">
                 {items.map((item) => {
                   const href = resolve(item.href);
                   const active =
-                    pathname === href ||
-                    (href !== `/g/${guildId}` && pathname.startsWith(href));
+                    pathname === href || (href !== `/g/${guildId}` && pathname.startsWith(href));
                   const Icon = item.icon;
                   return (
                     <li key={item.href}>
@@ -66,7 +65,9 @@ export function Sidebar({ guildId, guildName, complexityMode }: SidebarProps) {
                         <Icon
                           className={cn(
                             'size-4 shrink-0 transition-colors',
-                            active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground',
+                            active
+                              ? 'text-primary'
+                              : 'text-muted-foreground group-hover:text-foreground',
                           )}
                         />
                         {item.label}
@@ -80,8 +81,8 @@ export function Sidebar({ guildId, guildName, complexityMode }: SidebarProps) {
         })}
       </nav>
 
-      <div className="border-t border-sidebar-border p-3">
-        <span className="block px-3 text-xs capitalize text-muted-foreground">
+      <div className="border-sidebar-border border-t p-3">
+        <span className="text-muted-foreground block px-3 text-xs capitalize">
           {complexityMode} mode
         </span>
       </div>

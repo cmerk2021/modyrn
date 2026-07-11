@@ -22,8 +22,7 @@ export const ModerationActionType = {
   Purge: 'purge',
 } as const;
 
-export type ModerationActionType =
-  (typeof ModerationActionType)[keyof typeof ModerationActionType];
+export type ModerationActionType = (typeof ModerationActionType)[keyof typeof ModerationActionType];
 
 export const MODERATION_ACTION_TYPES = Object.values(ModerationActionType);
 
@@ -83,7 +82,11 @@ export const ACTION_METADATA: Record<
     pastTense: 'removed timeout from',
     severity: CaseSeverity.Low,
   },
-  [ModerationActionType.Kick]: { label: 'Kick', pastTense: 'kicked', severity: CaseSeverity.Medium },
+  [ModerationActionType.Kick]: {
+    label: 'Kick',
+    pastTense: 'kicked',
+    severity: CaseSeverity.Medium,
+  },
   [ModerationActionType.Ban]: { label: 'Ban', pastTense: 'banned', severity: CaseSeverity.High },
   [ModerationActionType.Unban]: {
     label: 'Unban',

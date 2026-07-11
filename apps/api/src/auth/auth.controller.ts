@@ -1,13 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import {
-  BadRequestException,
-  Controller,
-  Get,
-  Post,
-  Query,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { AppConfigService } from '../config/app-config.service.js';

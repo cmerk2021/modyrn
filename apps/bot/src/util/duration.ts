@@ -11,7 +11,10 @@ const UNIT_MS: Record<string, number> = {
  * Returns `undefined` for empty or unparseable input.
  */
 export function parseDuration(input: string): number | undefined {
-  const matches = input.trim().toLowerCase().matchAll(/(\d+)\s*([smhdw])/g);
+  const matches = input
+    .trim()
+    .toLowerCase()
+    .matchAll(/(\d+)\s*([smhdw])/g);
   let total = 0;
   let matched = false;
   for (const match of matches) {

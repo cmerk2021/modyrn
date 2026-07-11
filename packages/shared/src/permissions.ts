@@ -28,8 +28,7 @@ export const DashboardPermission = {
   ManageUpdates: 'manage_updates',
 } as const;
 
-export type DashboardPermission =
-  (typeof DashboardPermission)[keyof typeof DashboardPermission];
+export type DashboardPermission = (typeof DashboardPermission)[keyof typeof DashboardPermission];
 
 export const DASHBOARD_PERMISSIONS = Object.values(DashboardPermission);
 

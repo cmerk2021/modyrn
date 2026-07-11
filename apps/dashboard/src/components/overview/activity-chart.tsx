@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface ActivityPoint {

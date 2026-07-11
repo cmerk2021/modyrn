@@ -5,9 +5,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Allows this workflow to be reused by the release pipeline.
+  workflow_call:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # Scope by workflow so the standalone CI run and the release pipeline's reused
+  # CI run don't cancel one another on the same ref.
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:

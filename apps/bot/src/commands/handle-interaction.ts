@@ -70,9 +70,7 @@ export async function handleInteraction(
     }
 
     await interaction.editReply(
-      result.caseNumber
-        ? `Done. Created case #${result.caseNumber}.`
-        : 'Action completed.',
+      result.caseNumber ? `Done. Created case #${result.caseNumber}.` : 'Action completed.',
     );
   } catch (error) {
     logger.error({ err: error, command: interaction.commandName }, 'Interaction handling failed');

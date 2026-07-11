@@ -21,8 +21,8 @@ export function StatCard({ label, value, icon: Icon, delta, display, loading }: 
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <span className="text-muted-foreground text-sm">{label}</span>
+        <span className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
           <Icon className="size-4" />
         </span>
       </div>

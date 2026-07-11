@@ -1,9 +1,5 @@
 import { boolean, index, integer, jsonb, pgTable, varchar } from 'drizzle-orm/pg-core';
-import type {
-  AutomodAction,
-  AutomodConditionGroup,
-  AutomodEventType,
-} from '@modyrn/shared';
+import type { AutomodAction, AutomodConditionGroup, AutomodEventType } from '@modyrn/shared';
 import { snowflake, timestamps } from './_shared.js';
 import { guilds } from './guilds.js';
 

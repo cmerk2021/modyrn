@@ -35,7 +35,7 @@ export default function LandingPage() {
 
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-2 font-semibold">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary/15 text-primary">
+          <div className="bg-primary/15 text-primary flex size-8 items-center justify-center rounded-lg">
             <ShieldCheck className="size-5" />
           </div>
           Modyrn
@@ -43,7 +43,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-3">
           <Link
             href="https://github.com/modyrn/modyrn"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
           >
             GitHub
           </Link>
@@ -54,16 +54,16 @@ export default function LandingPage() {
       </header>
 
       <section className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-20 text-center">
-        <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+        <span className="border-border bg-card text-muted-foreground mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs">
           <span className="size-1.5 rounded-full bg-[var(--color-success)]" />
           Self-hosted · Open source
         </span>
         <h1 className="text-balance text-5xl font-semibold tracking-tight sm:text-6xl">
           Dashboard-first moderation for modern Discord communities.
         </h1>
-        <p className="mt-6 max-w-xl text-balance text-lg text-muted-foreground">
-          Modyrn is a self-hosted moderation platform — not a bot. The dashboard is the product;
-          the bot is just an agent. Progressive complexity scales from 10 to 500,000+ members.
+        <p className="text-muted-foreground mt-6 max-w-xl text-balance text-lg">
+          Modyrn is a self-hosted moderation platform — not a bot. The dashboard is the product; the
+          bot is just an agent. Progressive complexity scales from 10 to 500,000+ members.
         </p>
         <div className="mt-8 flex items-center gap-3">
           <Button asChild size="lg">
@@ -72,9 +72,7 @@ export default function LandingPage() {
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link href="https://github.com/modyrn/modyrn#quick-start-self-hosting">
-              Self-host
-            </Link>
+            <Link href="https://github.com/modyrn/modyrn#quick-start-self-hosting">Self-host</Link>
           </Button>
         </div>
       </section>
@@ -85,13 +83,13 @@ export default function LandingPage() {
           return (
             <div
               key={feature.title}
-              className="rounded-xl border border-border bg-card p-5 text-left"
+              className="border-border bg-card rounded-xl border p-5 text-left"
             >
-              <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-primary/12 text-primary">
+              <div className="bg-primary/12 text-primary mb-3 flex size-9 items-center justify-center rounded-lg">
                 <Icon className="size-5" />
               </div>
               <h3 className="text-sm font-semibold">{feature.title}</h3>
-              <p className="mt-1.5 text-sm text-muted-foreground">{feature.body}</p>
+              <p className="text-muted-foreground mt-1.5 text-sm">{feature.body}</p>
             </div>
           );
         })}

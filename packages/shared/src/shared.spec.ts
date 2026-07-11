@@ -22,9 +22,9 @@ describe('hasPermission', () => {
   });
 
   it('checks for the specific permission otherwise', () => {
-    expect(hasPermission([DashboardPermission.ViewMembers], DashboardPermission.ManageMembers)).toBe(
-      false,
-    );
+    expect(
+      hasPermission([DashboardPermission.ViewMembers], DashboardPermission.ManageMembers),
+    ).toBe(false);
     expect(
       hasPermission([DashboardPermission.ManageMembers], DashboardPermission.ManageMembers),
     ).toBe(true);

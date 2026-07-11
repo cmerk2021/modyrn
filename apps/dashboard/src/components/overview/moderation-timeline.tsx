@@ -32,14 +32,14 @@ export function ModerationTimeline({ cases }: ModerationTimelineProps) {
       </CardHeader>
       <div className="px-6 pb-6">
         {cases.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">No recent actions.</p>
+          <p className="text-muted-foreground py-8 text-center text-sm">No recent actions.</p>
         ) : (
-          <ol className="relative space-y-4 border-l border-border pl-4">
+          <ol className="border-border relative space-y-4 border-l pl-4">
             {cases.map((item) => {
               const meta = ACTION_METADATA[item.action];
               return (
                 <li key={item.id} className="relative">
-                  <span className="absolute -left-[1.32rem] top-1 size-2 rounded-full bg-primary" />
+                  <span className="bg-primary absolute -left-[1.32rem] top-1 size-2 rounded-full" />
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm">
                       <span className="font-medium">{item.moderatorLabel}</span>{' '}
@@ -48,7 +48,7 @@ export function ModerationTimeline({ cases }: ModerationTimelineProps) {
                     </span>
                     <Badge variant={SEVERITY_VARIANT[meta.severity]}>#{item.caseNumber}</Badge>
                   </div>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-muted-foreground text-xs">
                     {formatRelativeTime(item.createdAt)}
                   </span>
                 </li>

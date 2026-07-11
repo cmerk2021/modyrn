@@ -8,12 +8,7 @@ import {
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/pg-core';
-import type {
-  ActionOrigin,
-  CaseSeverity,
-  CaseStatus,
-  ModerationActionType,
-} from '@modyrn/shared';
+import type { ActionOrigin, CaseSeverity, CaseStatus, ModerationActionType } from '@modyrn/shared';
 import { snowflake, timestamps } from './_shared.js';
 import { guilds } from './guilds.js';
 

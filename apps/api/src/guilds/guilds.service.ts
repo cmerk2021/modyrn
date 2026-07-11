@@ -61,9 +61,7 @@ export class GuildsService {
   async assertAccess(userId: string, guildId: string): Promise<void> {
     const accessToken = await this.auth.getAccessToken(userId);
     const discordGuilds = accessToken ? await this.discord.fetchGuilds(accessToken) : [];
-    const canManage = discordGuilds.some(
-      (g) => g.id === guildId && this.discord.canManageGuild(g),
-    );
+    const canManage = discordGuilds.some((g) => g.id === guildId && this.discord.canManageGuild(g));
     if (!canManage) {
       throw new ForbiddenException('You do not have access to manage this guild.');
     }

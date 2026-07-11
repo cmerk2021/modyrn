@@ -35,10 +35,7 @@ export function meetsComplexity(active: ComplexityMode, required: ComplexityMode
   return COMPLEXITY_ORDER.indexOf(active) >= COMPLEXITY_ORDER.indexOf(required);
 }
 
-export const COMPLEXITY_METADATA: Record<
-  ComplexityMode,
-  { label: string; description: string }
-> = {
+export const COMPLEXITY_METADATA: Record<ComplexityMode, { label: string; description: string }> = {
   [ComplexityMode.Simple]: {
     label: 'Simple',
     description: 'Sane defaults and the essentials. Perfect for small communities.',

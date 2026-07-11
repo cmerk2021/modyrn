@@ -1,6 +1,14 @@
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+const monorepoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  // In a monorepo, standalone output must trace from the repo root so workspace
+  // packages (@modyrn/*) are bundled into the Docker image.
+  outputFileTracingRoot: monorepoRoot,
   reactStrictMode: true,
   poweredByHeader: false,
   transpilePackages: ['@modyrn/shared'],

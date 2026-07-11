@@ -17,7 +17,7 @@ interface StatusPillProps {
 export function StatusPill({ label, status, detail }: StatusPillProps) {
   const meta = STATUS_META[status];
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
+    <div className="border-border bg-card flex items-center gap-3 rounded-lg border px-4 py-3">
       <span className="relative flex size-2.5">
         <span
           className={cn(
@@ -29,7 +29,7 @@ export function StatusPill({ label, status, detail }: StatusPillProps) {
       </span>
       <div className="min-w-0">
         <p className="text-sm font-medium">{label}</p>
-        <p className="truncate text-xs text-muted-foreground">{detail ?? meta.label}</p>
+        <p className="text-muted-foreground truncate text-xs">{detail ?? meta.label}</p>
       </div>
     </div>
   );

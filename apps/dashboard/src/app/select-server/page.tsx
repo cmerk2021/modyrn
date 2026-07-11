@@ -18,16 +18,16 @@ export default async function SelectServerPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center px-6 py-16">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">Choose a server</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-sm">
           Select a community to manage with Modyrn.
         </p>
       </div>
 
       {session.guilds.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-8 text-center">
-          <ShieldCheck className="mx-auto mb-3 size-6 text-muted-foreground" />
+        <div className="border-border rounded-xl border border-dashed p-8 text-center">
+          <ShieldCheck className="text-muted-foreground mx-auto mb-3 size-6" />
           <p className="text-sm font-medium">No manageable servers found</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-sm">
             You need the Manage Server permission in a Discord server to manage it here.
           </p>
         </div>
@@ -41,9 +41,9 @@ export default async function SelectServerPage() {
               <li key={guild.id}>
                 <Link
                   href={`/g/${guild.id}`}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent"
+                  className="border-border bg-card hover:border-primary/40 hover:bg-accent flex items-center gap-3 rounded-xl border p-4 transition-colors"
                 >
-                  <span className="flex size-10 items-center justify-center overflow-hidden rounded-lg bg-primary/15 text-sm font-semibold text-primary">
+                  <span className="bg-primary/15 text-primary flex size-10 items-center justify-center overflow-hidden rounded-lg text-sm font-semibold">
                     {icon ? (
                       <img src={icon} alt={guild.name} className="size-full object-cover" />
                     ) : (
@@ -52,11 +52,11 @@ export default async function SelectServerPage() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{guild.name}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {guild.owner ? 'Owner' : 'Manager'}
                     </p>
                   </div>
-                  <ChevronRight className="size-4 text-muted-foreground" />
+                  <ChevronRight className="text-muted-foreground size-4" />
                 </Link>
               </li>
             );
