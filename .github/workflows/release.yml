@@ -117,7 +117,7 @@ jobs:
             type=semver,pattern={{major}},value=${{ needs.guard.outputs.version }}
 
       - name: Build & push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/${{ matrix.app }}.Dockerfile
