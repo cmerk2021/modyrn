@@ -1,0 +1,43 @@
+# ---------------------------------------------------------------------------
+# Modyrn — local development dependencies only.
+# Runs Postgres and Redis; apps run on the host via `pnpm dev`.
+#
+#   docker compose -f docker/docker-compose.dev.yml up -d
+# ---------------------------------------------------------------------------
+
+name: modyrn-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: modyrn
+      POSTGRES_PASSWORD: modyrn
+      POSTGRES_DB: modyrn
+    ports:
+      - '5432:5432'
+    volumes:
+      - modyrn-dev-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U modyrn']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - modyrn-dev-redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  modyrn-dev-postgres:
+  modyrn-dev-redis:

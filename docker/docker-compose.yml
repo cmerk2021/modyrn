@@ -1,0 +1,97 @@
+# ---------------------------------------------------------------------------
+# Modyrn — production deployment
+#
+#   docker compose up -d
+#
+# Images are pulled from the GitHub Container Registry. See docs/installation.md.
+# ---------------------------------------------------------------------------
+
+name: modyrn
+
+x-common-env: &common-env
+  NODE_ENV: production
+  DATABASE_URL: postgresql://${POSTGRES_USER:-modyrn}:${POSTGRES_PASSWORD:-modyrn}@postgres:5432/${POSTGRES_DB:-modyrn}
+  REDIS_URL: redis://redis:6379
+  DISCORD_TOKEN: ${DISCORD_TOKEN}
+  DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+  DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+  DISCORD_PUBLIC_KEY: ${DISCORD_PUBLIC_KEY}
+  JWT_SECRET: ${JWT_SECRET}
+  ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+  PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-modyrn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-modyrn}
+      POSTGRES_DB: ${POSTGRES_DB:-modyrn}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-modyrn}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: ghcr.io/modyrn/modyrn-api:${MODYRN_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      API_PORT: 4000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '${API_PORT:-4000}:4000'
+    healthcheck:
+      test: ['CMD', 'node', '-e', "require('http').get('http://localhost:4000/api/v1/health/ready', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  bot:
+    image: ghcr.io/modyrn/modyrn-bot:${MODYRN_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      API_URL: http://api:4000
+    depends_on:
+      api:
+        condition: service_healthy
+
+  dashboard:
+    image: ghcr.io/modyrn/modyrn-dashboard:${MODYRN_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${PUBLIC_URL:-http://localhost:3000}/api
+      NEXT_PUBLIC_APP_URL: ${PUBLIC_URL:-http://localhost:3000}
+      API_URL: http://api:4000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - '${DASHBOARD_PORT:-3000}:3000'
+
+volumes:
+  postgres-data:
+  redis-data:

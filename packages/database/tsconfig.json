@@ -1,0 +1,10 @@
+{
+  "extends": "@modyrn/config/tsconfig/library.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "drizzle.config.ts"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+}
