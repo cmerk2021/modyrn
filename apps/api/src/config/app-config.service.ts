@@ -28,8 +28,10 @@ export class AppConfigService {
       clientSecret: this.get('DISCORD_CLIENT_SECRET'),
       token: this.get('DISCORD_TOKEN'),
       publicKey: this.get('DISCORD_PUBLIC_KEY'),
-      /** OAuth redirect URI derived from the API URL. */
-      redirectUri: `${this.get('API_URL')}/api/v1/auth/discord/callback`,
+      // The OAuth callback must be reachable by the user's browser, so it goes
+      // through the public dashboard origin (which proxies /api/v1 to the API),
+      // NOT the internal API_URL (e.g. http://api:4000).
+      redirectUri: `${this.get('PUBLIC_URL')}/api/v1/auth/discord/callback`,
     };
   }
 
