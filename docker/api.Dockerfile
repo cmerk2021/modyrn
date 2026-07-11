@@ -6,7 +6,9 @@
 FROM node:20-alpine AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+# Pin pnpm to the version the repo declares so builds don't pick up an
+# incompatible pnpm@latest before any package.json is present.
+RUN corepack enable && corepack prepare pnpm@9.12.0 --activate
 WORKDIR /app
 
 # --- Prune the monorepo to just what the API needs --------------------------
