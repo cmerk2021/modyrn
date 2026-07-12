@@ -22,6 +22,12 @@ COPY --from=pruner /app/out/json/ .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY --from=pruner /app/out/full/ .
 ENV NEXT_TELEMETRY_DISABLED=1
+# Next bakes rewrite() destinations at build time. The dashboard proxies
+# /api/v1/* to the API over the internal Docker network; that hostname must be
+# known here, at build. Defaults to the compose service name `api`; override
+# with --build-arg API_URL=... if you rename the service.
+ARG API_URL=http://api:4000
+ENV API_URL=${API_URL}
 RUN pnpm turbo run build --filter=@modyrn/dashboard
 
 FROM node:20-alpine AS runner
