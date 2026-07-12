@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { eq, guilds, type Database, type Guild } from '@modyrn/database';
 import type { ComplexityMode } from '@modyrn/shared';
 import { InjectDatabase } from '../database/inject-database.decorator.js';
@@ -32,6 +32,8 @@ export interface GuildAccess {
  */
 @Injectable()
 export class GuildsService {
+  private readonly logger = new Logger(GuildsService.name);
+
   constructor(
     @InjectDatabase() private readonly db: Database,
     private readonly auth: AuthService,
@@ -81,10 +83,20 @@ export class GuildsService {
   /**
    * Real-time bot-presence check for a guild (via the bot token), plus the
    * invite URL to add it. Drives the dashboard's "invite the bot" gate.
+   *
+   * The invite URL only depends on the client ID, so it is always returned even
+   * if the presence check fails (e.g. transient Discord/token error) — otherwise
+   * the "add the bot" button would have no destination.
    */
   async getAccess(guildId: string): Promise<GuildAccess> {
-    const botPresent = await this.rest.isBotInGuild(guildId);
-    return { botPresent, inviteUrl: this.rest.botInviteUrl(guildId) };
+    const inviteUrl = this.rest.botInviteUrl(guildId);
+    let botPresent = false;
+    try {
+      botPresent = await this.rest.isBotInGuild(guildId);
+    } catch (error) {
+      this.logger.warn(`Bot presence check failed for guild ${guildId}: ${String(error)}`);
+    }
+    return { botPresent, inviteUrl };
   }
 
   /** Guild roles and channels for dashboard pickers. */

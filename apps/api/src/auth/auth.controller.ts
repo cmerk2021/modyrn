@@ -91,6 +91,9 @@ export class AuthController {
         avatar: user.avatar,
       },
       guilds,
+      // Exposed so the dashboard can build a bot invite URL without depending on
+      // any guild-scoped call.
+      botClientId: this.config.discord.clientId,
     };
   }
 

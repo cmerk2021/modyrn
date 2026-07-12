@@ -18,6 +18,22 @@ export interface SessionGuild {
 export interface Session {
   user: SessionUser;
   guilds: SessionGuild[];
+  botClientId: string;
+}
+
+/**
+ * Builds the Discord bot invite URL for a specific guild from the bot client ID.
+ * Independent of any guild-scoped API call so the invite button always works.
+ */
+export function buildInviteUrl(botClientId: string, guildId: string): string {
+  const params = new URLSearchParams({
+    client_id: botClientId,
+    scope: 'bot applications.commands',
+    permissions: '8',
+    guild_id: guildId,
+    disable_guild_select: 'true',
+  });
+  return `https://discord.com/oauth2/authorize?${params.toString()}`;
 }
 
 /**

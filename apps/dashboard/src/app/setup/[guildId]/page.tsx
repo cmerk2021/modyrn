@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getSession } from '@/lib/session';
+import { buildInviteUrl, getSession } from '@/lib/session';
 import { getGuildAccess } from '@/lib/guilds';
 import { InviteFlow } from './invite-flow';
 
@@ -25,11 +25,9 @@ export default async function SetupPage({ params }: { params: Promise<{ guildId:
   // Already added — go straight to the dashboard.
   if (access?.botPresent) redirect(`/g/${guildId}`);
 
-  return (
-    <InviteFlow
-      guildId={guildId}
-      guildName={membership.name}
-      inviteUrl={access?.inviteUrl ?? '#'}
-    />
-  );
+  // Prefer the API-provided invite URL, but always fall back to one we build
+  // from the bot client ID so the button is never a dead link.
+  const inviteUrl = access?.inviteUrl ?? buildInviteUrl(session.botClientId, guildId);
+
+  return <InviteFlow guildId={guildId} guildName={membership.name} inviteUrl={inviteUrl} />;
 }
