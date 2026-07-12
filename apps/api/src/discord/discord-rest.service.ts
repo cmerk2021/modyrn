@@ -58,6 +58,22 @@ export const ChannelType = {
 
 /** Permission bit for SEND_MESSAGES (used for channel lockdown). */
 export const SEND_MESSAGES = 1n << 11n;
+const ADD_REACTIONS = 1n << 6n;
+const CREATE_PUBLIC_THREADS = 1n << 35n;
+const CREATE_PRIVATE_THREADS = 1n << 36n;
+const SEND_MESSAGES_IN_THREADS = 1n << 38n;
+
+/**
+ * Permissions denied on a role when a channel is locked. Covers sending
+ * messages, reacting and thread creation/participation so a locked channel is
+ * fully quiet for the affected role — not just the primary SEND_MESSAGES bit.
+ */
+export const LOCKDOWN_PERMISSIONS =
+  SEND_MESSAGES |
+  ADD_REACTIONS |
+  CREATE_PUBLIC_THREADS |
+  CREATE_PRIVATE_THREADS |
+  SEND_MESSAGES_IN_THREADS;
 
 interface RequestOptions {
   method?: string;
@@ -295,15 +311,15 @@ export class DiscordRestService {
     });
   }
 
-  /** Overrides a role's SEND_MESSAGES permission in a channel (lock/unlock). */
+  /** Overrides a role's lockdown permissions in a channel (lock/unlock). */
   setChannelSendPermission(channelId: string, roleId: string, allow: boolean, reason?: string) {
-    // type 0 = role overwrite. Deny SEND_MESSAGES to lock.
+    // type 0 = role overwrite. Deny the lockdown permission set to lock.
     return this.request(`/channels/${channelId}/permissions/${roleId}`, {
       method: 'PUT',
       reason,
       body: {
         type: 0,
-        deny: allow ? '0' : SEND_MESSAGES.toString(),
+        deny: allow ? '0' : LOCKDOWN_PERMISSIONS.toString(),
         allow: '0',
       },
     });

@@ -40,6 +40,11 @@ export async function handleInteraction(
       return;
     }
 
+    if (interaction.commandName === 'lock' || interaction.commandName === 'unlock') {
+      await handleLock(interaction, api);
+      return;
+    }
+
     const action = COMMAND_ACTION[interaction.commandName];
     if (!action) {
       await interaction.editReply('Unknown command.');
@@ -76,6 +81,24 @@ export async function handleInteraction(
     logger.error({ err: error, command: interaction.commandName }, 'Interaction handling failed');
     await interaction.editReply('Something went wrong handling that command.');
   }
+}
+
+async function handleLock(interaction: ChatInputCommandInteraction, api: ApiClient): Promise<void> {
+  const locked = interaction.commandName === 'lock';
+  const result = await api.post<{ channelId: string; locked: boolean }>('/internal/lock', {
+    guildId: interaction.guildId,
+    channelId: interaction.channelId,
+    moderatorId: interaction.user.id,
+    locked,
+    reason: interaction.options.getString('reason') ?? undefined,
+  });
+  if (!result) {
+    await interaction.editReply('The channel could not be updated. Please try again.');
+    return;
+  }
+  await interaction.editReply(
+    locked ? 'This channel is now locked.' : 'This channel is now unlocked.',
+  );
 }
 
 async function handleCaseLookup(

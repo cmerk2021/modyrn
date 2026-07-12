@@ -85,6 +85,20 @@ export const commandDefinitions: RESTPostAPIChatInputApplicationCommandsJSONBody
     .toJSON(),
 
   new SlashCommandBuilder()
+    .setName('lock')
+    .setDescription('Lock this channel so the member role cannot chat.')
+    .addStringOption((o) => o.setName('reason').setDescription('Reason for locking.'))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName('unlock')
+    .setDescription('Unlock this channel, restoring the member role permissions.')
+    .addStringOption((o) => o.setName('reason').setDescription('Reason for unlocking.'))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    .toJSON(),
+
+  new SlashCommandBuilder()
     .setName('case')
     .setDescription('Look up a moderation case by number.')
     .addIntegerOption((o) =>

@@ -5,6 +5,7 @@ import { Public } from '../auth/public.decorator.js';
 import { ModerationService } from '../moderation/moderation.service.js';
 import { CasesService } from '../cases/cases.service.js';
 import { EventsService } from '../events/events.service.js';
+import { EmergencyService } from '../emergency/emergency.service.js';
 import { InternalGuard } from './internal.guard.js';
 import { InternalService, type GuildSyncPayload } from './internal.service.js';
 
@@ -35,6 +36,7 @@ export class InternalController {
     private readonly moderation: ModerationService,
     private readonly cases: CasesService,
     private readonly events: EventsService,
+    private readonly emergency: EmergencyService,
   ) {}
 
   @Post('guilds/sync')
@@ -95,6 +97,19 @@ export class InternalController {
       default:
         return { ok: false, error: 'Unsupported action' };
     }
+  }
+
+  /** Locks or unlocks the current channel for the `/lock` and `/unlock` commands. */
+  @Post('lock')
+  async lock(
+    @Body() body: { guildId: string; channelId: string; locked: boolean; moderatorId: string },
+  ) {
+    return this.emergency.setChannelLock(
+      body.guildId,
+      body.channelId,
+      body.locked,
+      body.moderatorId,
+    );
   }
 
   /** Looks up a case by its per-guild number for the `/case` command. */

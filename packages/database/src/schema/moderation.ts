@@ -63,6 +63,63 @@ export const cases = pgTable(
 export type Case = typeof cases.$inferSelect;
 export type NewCase = typeof cases.$inferInsert;
 
+/**
+ * A timeline entry attached to a specific case — an investigative note or a
+ * piece of context added by a moderator after the fact. Distinct from
+ * `memberNotes`, which are attached to a member rather than a single case.
+ */
+export const caseNotes = pgTable(
+  'case_notes',
+  {
+    id: varchar('id', { length: 26 }).primaryKey(),
+    caseId: varchar('case_id', { length: 26 })
+      .notNull()
+      .references(() => cases.id, { onDelete: 'cascade' }),
+    guildId: snowflake('guild_id')
+      .notNull()
+      .references(() => guilds.id, { onDelete: 'cascade' }),
+    authorId: snowflake('author_id').notNull(),
+    content: varchar('content', { length: 2000 }).notNull(),
+    ...timestamps,
+  },
+  (table) => ({
+    caseIdx: index('case_notes_case_idx').on(table.caseId),
+  }),
+);
+
+export type CaseNote = typeof caseNotes.$inferSelect;
+export type NewCaseNote = typeof caseNotes.$inferInsert;
+
+/**
+ * A directional link between two cases, used to attach prior moderation history
+ * to a case — e.g. linking earlier warns to the ban they culminated in. The
+ * link points from `caseId` (the current case) to `linkedCaseId` (the prior one).
+ */
+export const caseLinks = pgTable(
+  'case_links',
+  {
+    id: varchar('id', { length: 26 }).primaryKey(),
+    guildId: snowflake('guild_id')
+      .notNull()
+      .references(() => guilds.id, { onDelete: 'cascade' }),
+    caseId: varchar('case_id', { length: 26 })
+      .notNull()
+      .references(() => cases.id, { onDelete: 'cascade' }),
+    linkedCaseId: varchar('linked_case_id', { length: 26 })
+      .notNull()
+      .references(() => cases.id, { onDelete: 'cascade' }),
+    createdBy: snowflake('created_by').notNull(),
+    ...timestamps,
+  },
+  (table) => ({
+    uniqueLink: uniqueIndex('case_links_unique_idx').on(table.caseId, table.linkedCaseId),
+    caseIdx: index('case_links_case_idx').on(table.caseId),
+  }),
+);
+
+export type CaseLink = typeof caseLinks.$inferSelect;
+export type NewCaseLink = typeof caseLinks.$inferInsert;
+
 /** Appeal against a case, submitted by the affected user. */
 export const appeals = pgTable(
   'appeals',

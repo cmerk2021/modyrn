@@ -15,6 +15,7 @@ import { HealthStatus, type ModerationActionType, type OverviewMetrics } from '@
 import { InjectDatabase } from '../database/inject-database.decorator.js';
 import { DatabaseService } from '../database/database.module.js';
 import { DiscordRestService } from '../discord/discord-rest.service.js';
+import { NamesService } from '../discord/names.service.js';
 import { REDIS } from '../redis/redis.module.js';
 
 export interface ActivityPoint {
@@ -48,6 +49,7 @@ export class OverviewService {
     @InjectDatabase() private readonly db: Database,
     private readonly database: DatabaseService,
     private readonly rest: DiscordRestService,
+    private readonly names: NamesService,
     @Inject(REDIS) private readonly redis: Redis,
   ) {}
 
@@ -158,12 +160,17 @@ export class OverviewService {
       .orderBy(desc(cases.createdAt))
       .limit(6);
 
+    const names = await this.names.userNames(
+      guildId,
+      rows.flatMap((c) => [c.targetUserId, c.moderatorId]),
+    );
+
     return rows.map((c) => ({
       id: c.id,
       caseNumber: c.caseNumber,
       action: c.action,
-      targetLabel: c.targetUserId,
-      moderatorLabel: c.moderatorId,
+      targetLabel: names[c.targetUserId] ?? c.targetUserId,
+      moderatorLabel: names[c.moderatorId] ?? c.moderatorId,
       createdAt: c.createdAt.toISOString(),
     }));
   }

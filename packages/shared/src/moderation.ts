@@ -54,6 +54,8 @@ export const CaseSeverity = {
 
 export type CaseSeverity = (typeof CaseSeverity)[keyof typeof CaseSeverity];
 
+export const CASE_SEVERITIES = Object.values(CaseSeverity);
+
 /** How the action was initiated. */
 export const ActionOrigin = {
   Dashboard: 'dashboard',

@@ -18,6 +18,7 @@ import { Input, Select } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CaseDetailDialog } from './case-detail-dialog';
 
 interface CaseRow {
   id: string;
@@ -27,6 +28,8 @@ interface CaseRow {
   severity: 'low' | 'medium' | 'high' | 'critical';
   targetUserId: string;
   moderatorId: string;
+  targetName: string;
+  moderatorName: string;
   reason: string | null;
   createdAt: string;
 }
@@ -44,13 +47,14 @@ export default function CasesPage() {
   const [action, setAction] = useState('');
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<string | null>(null);
 
   const params = new URLSearchParams({ page: String(page), pageSize: '25' });
   if (search) params.set('search', search);
   if (action) params.set('action', action);
   if (status) params.set('status', status);
 
-  const { data, loading } = useApiData<PaginatedResult<CaseRow>>(
+  const { data, loading, refetch } = useApiData<PaginatedResult<CaseRow>>(
     `/guilds/${guildId}/cases?${params.toString()}`,
   );
 
@@ -115,21 +119,26 @@ export default function CasesPage() {
           <p className="text-muted-foreground p-8 text-center text-sm">No cases found.</p>
         ) : (
           data.items.map((c) => (
-            <div key={c.id} className="flex items-center gap-3 p-4 text-sm">
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setSelected(c.id)}
+              className="hover:bg-muted/50 flex w-full items-center gap-3 p-4 text-left text-sm transition-colors"
+            >
               <span className="text-muted-foreground w-14 shrink-0 font-mono">#{c.caseNumber}</span>
               <Badge variant={SEVERITY[c.severity]}>{ACTION_METADATA[c.action]?.label}</Badge>
               <div className="min-w-0 flex-1">
                 <p className="truncate">
-                  <span className="text-muted-foreground">User</span>{' '}
-                  <span className="font-mono text-xs">{c.targetUserId}</span>
+                  <span className="font-medium">{c.targetName}</span>
                   {c.reason ? ` — ${c.reason}` : ''}
                 </p>
+                <p className="text-muted-foreground truncate text-xs">by {c.moderatorName}</p>
               </div>
               <span className="text-muted-foreground hidden text-xs sm:block">
                 {formatRelativeTime(c.createdAt)}
               </span>
               <Badge variant="outline">{c.status}</Badge>
-            </div>
+            </button>
           ))
         )}
       </Card>
@@ -158,6 +167,15 @@ export default function CasesPage() {
             </Button>
           </div>
         </div>
+      )}
+
+      {selected && (
+        <CaseDetailDialog
+          guildId={guildId}
+          caseId={selected}
+          onClose={() => setSelected(null)}
+          onChange={refetch}
+        />
       )}
     </div>
   );
