@@ -25,6 +25,9 @@ export const envSchema = z.object({
   PUBLIC_URL: z.string().url().default('http://localhost:3000'),
   API_URL: z.string().url().default('http://localhost:4000'),
 
+  /** Shared secret authenticating internal bot -> API calls. */
+  BOT_API_SECRET: z.string().optional(),
+
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 });
 

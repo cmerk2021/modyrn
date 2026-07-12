@@ -9,6 +9,8 @@ import { snowflake, timestamps } from './_shared.js';
 export interface GuildSettings {
   /** Channel used as the default moderation log destination. */
   modLogChannelId?: string;
+  /** Role applied to quarantined members by the default `/quarantine` action. */
+  quarantineRoleId?: string;
   /** Timezone used when rendering scheduled content, e.g. "Europe/London". */
   timezone?: string;
   /** Default DM-on-action behavior for moderation. */

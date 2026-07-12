@@ -8,9 +8,22 @@ import { CryptoModule } from './common/crypto/crypto.module.js';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { DatabaseModule } from './database/database.module.js';
 import { RedisModule } from './redis/redis.module.js';
+import { DiscordModule } from './discord/discord.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { HealthModule } from './health/health.module.js';
 import { GuildsModule } from './guilds/guilds.module.js';
+import { ModerationModule } from './moderation/moderation.module.js';
+import { MembersModule } from './members/members.module.js';
+import { CasesModule } from './cases/cases.module.js';
+import { AutomodModule } from './automod/automod.module.js';
+import { LoggingModule } from './logging/logging.module.js';
+import { EmergencyModule } from './emergency/emergency.module.js';
+import { PermissionsModule } from './permissions/permissions.module.js';
+import { AnalyticsModule } from './analytics/analytics.module.js';
+import { UtilityModule } from './utility/utility.module.js';
+import { BackupsModule } from './backups/backups.module.js';
+import { UpdatesModule } from './updates/updates.module.js';
+import { InternalModule } from './internal/internal.module.js';
 
 /**
  * Root application module. Wires together configuration, infrastructure
@@ -36,9 +49,22 @@ import { GuildsModule } from './guilds/guilds.module.js';
     CryptoModule,
     DatabaseModule,
     RedisModule,
+    DiscordModule,
     AuthModule,
     HealthModule,
     GuildsModule,
+    ModerationModule,
+    MembersModule,
+    CasesModule,
+    AutomodModule,
+    LoggingModule,
+    EmergencyModule,
+    PermissionsModule,
+    AnalyticsModule,
+    UtilityModule,
+    BackupsModule,
+    UpdatesModule,
+    InternalModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },

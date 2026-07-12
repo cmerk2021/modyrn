@@ -51,6 +51,11 @@ async function main(): Promise<void> {
     });
   });
 
+  client.on(Events.GuildDelete, (guild) => {
+    logger.info(`Removed from guild ${guild.id}`);
+    void api.post('/internal/guilds/left', { guildId: guild.id });
+  });
+
   client.on(Events.InteractionCreate, (interaction) => {
     if (interaction.isChatInputCommand()) {
       void handleInteraction(interaction, api);
@@ -62,12 +67,74 @@ async function main(): Promise<void> {
     void api.forwardEvent('member_join', {
       guildId: member.guild.id,
       userId: member.id,
+      username: member.user.username,
+      hasAvatar: Boolean(member.user.avatar),
       joinedAt: member.joinedAt?.toISOString(),
     });
   });
 
   client.on(Events.GuildMemberRemove, (member) => {
     void api.forwardEvent('member_leave', { guildId: member.guild.id, userId: member.id });
+  });
+
+  // Forward message events for automod evaluation and message logging.
+  client.on(Events.MessageCreate, (message) => {
+    if (!message.inGuild() || message.author.bot) return;
+    void api.forwardEvent('message_create', {
+      guildId: message.guild.id,
+      channelId: message.channelId,
+      messageId: message.id,
+      content: message.content,
+      mentionCount: message.mentions.users.size + message.mentions.roles.size,
+      attachmentCount: message.attachments.size,
+      nickname: message.member?.nickname ?? null,
+      author: {
+        id: message.author.id,
+        username: message.author.username,
+        bot: message.author.bot,
+        avatar: message.author.avatar,
+      },
+      member: {
+        roles: message.member?.roles.cache.map((r) => r.id) ?? [],
+        joinedAt: message.member?.joinedAt?.toISOString(),
+      },
+    });
+  });
+
+  client.on(Events.MessageUpdate, (_oldMessage, newMessage) => {
+    if (!newMessage.inGuild() || newMessage.author?.bot) return;
+    void api.forwardEvent('message_update', {
+      guildId: newMessage.guild.id,
+      channelId: newMessage.channelId,
+      messageId: newMessage.id,
+      authorId: newMessage.author?.id,
+      before: _oldMessage.content ?? '',
+      content: newMessage.content,
+      mentionCount: newMessage.mentions.users.size + newMessage.mentions.roles.size,
+      attachmentCount: newMessage.attachments.size,
+      author: newMessage.author
+        ? {
+            id: newMessage.author.id,
+            username: newMessage.author.username,
+            bot: newMessage.author.bot,
+            avatar: newMessage.author.avatar,
+          }
+        : undefined,
+      member: {
+        roles: newMessage.member?.roles.cache.map((r) => r.id) ?? [],
+        joinedAt: newMessage.member?.joinedAt?.toISOString(),
+      },
+    });
+  });
+
+  client.on(Events.MessageDelete, (message) => {
+    if (!message.inGuild()) return;
+    void api.forwardEvent('message_delete', {
+      guildId: message.guild.id,
+      channelId: message.channelId,
+      authorId: message.author?.id,
+      content: message.content ?? '',
+    });
   });
 
   const shutdown = async (signal: string) => {

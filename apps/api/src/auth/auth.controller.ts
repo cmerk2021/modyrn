@@ -70,7 +70,7 @@ export class AuthController {
       path: '/',
     });
 
-    res.redirect(this.config.publicUrl);
+    res.redirect(`${this.config.publicUrl}/select-server`);
   }
 
   /** Returns the current user along with the guilds they can manage. */

@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ArrowRight, ShieldCheck, Sparkles, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getSession } from '@/lib/session';
 
 const features = [
   {
@@ -25,7 +27,11 @@ const features = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Signed-in visitors skip the marketing page and go straight to the app.
+  const session = await getSession();
+  if (session) redirect('/select-server');
+
   return (
     <main className="relative flex min-h-screen flex-col overflow-hidden">
       <div

@@ -14,6 +14,11 @@ export class UpdateGuildSettingsDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(20)
+  quarantineRoleId?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(64)
   timezone?: string;
 

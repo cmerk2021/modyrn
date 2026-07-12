@@ -27,6 +27,20 @@ export class GuildsController {
     return this.overview.getOverview(id);
   }
 
+  /** Whether the bot is in the guild, plus an invite URL if not. */
+  @Get(':id/access')
+  async getAccess(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+    await this.guilds.assertAccess(user.id, id);
+    return this.guilds.getAccess(id);
+  }
+
+  /** Guild roles and channels — used by settings, logging, utility pickers. */
+  @Get(':id/meta')
+  async getMeta(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+    await this.guilds.assertAccess(user.id, id);
+    return this.guilds.getMeta(id);
+  }
+
   /** Overview and settings for a single guild. */
   @Get(':id')
   async get(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
