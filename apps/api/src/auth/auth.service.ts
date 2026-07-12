@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Redis } from 'ioredis';
 import {
   and,
   dashboardUsers,
@@ -12,12 +13,25 @@ import {
 } from '@modyrn/database';
 import { InjectDatabase } from '../database/inject-database.decorator.js';
 import { CryptoService } from '../common/crypto/crypto.service.js';
+import { REDIS } from '../redis/redis.module.js';
 import { ulid } from '../common/id.util.js';
 import type { SessionJwtPayload } from './auth.types.js';
-import { type DiscordTokenResponse, type DiscordUser } from './discord-oauth.service.js';
+import {
+  DiscordOAuthService,
+  type DiscordTokenResponse,
+  type DiscordUser,
+} from './discord-oauth.service.js';
 
 /** Sessions live for 7 days by default. */
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** A guild the user can manage (subset used across the dashboard). */
+export interface ManagedGuildSummary {
+  id: string;
+  name: string;
+  icon: string | null;
+  owner: boolean;
+}
 
 export interface LoginResult {
   jwt: string;
@@ -30,10 +44,14 @@ export interface LoginResult {
  */
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectDatabase() private readonly db: Database,
     private readonly jwt: JwtService,
     private readonly crypto: CryptoService,
+    private readonly discord: DiscordOAuthService,
+    @Inject(REDIS) private readonly redis: Redis,
   ) {}
 
   /**
@@ -133,6 +151,43 @@ export class AuthService {
       .limit(1);
     if (!row) return null;
     return this.crypto.decrypt(row.accessToken);
+  }
+
+  /**
+   * Returns the guilds the user can manage, cached in Redis to avoid hammering
+   * Discord's rate-limited user endpoints on every navigation. On a Discord
+   * failure (e.g. rate limit) it falls back to the last good result so the user
+   * is never spuriously treated as unauthenticated or without access.
+   */
+  async getManageableGuilds(userId: string): Promise<ManagedGuildSummary[]> {
+    const freshKey = `modyrn:guilds:${userId}`;
+    const lastKey = `modyrn:guilds:${userId}:last`;
+
+    const cached = await this.redis.get(freshKey).catch(() => null);
+    if (cached) return JSON.parse(cached) as ManagedGuildSummary[];
+
+    const accessToken = await this.getAccessToken(userId);
+    if (!accessToken) return [];
+
+    try {
+      const guilds = (await this.discord.fetchGuilds(accessToken))
+        .filter((g) => this.discord.canManageGuild(g))
+        .map((g) => ({ id: g.id, name: g.name, icon: g.icon, owner: g.owner }));
+      const serialized = JSON.stringify(guilds);
+      await this.redis.set(freshKey, serialized, 'EX', 60).catch(() => null);
+      await this.redis.set(lastKey, serialized, 'EX', 86_400).catch(() => null);
+      return guilds;
+    } catch (error) {
+      this.logger.warn(`fetchGuilds failed for ${userId}, using cached list: ${String(error)}`);
+      const last = await this.redis.get(lastKey).catch(() => null);
+      return last ? (JSON.parse(last) as ManagedGuildSummary[]) : [];
+    }
+  }
+
+  /** True when the user can manage the given guild (uses the cached list). */
+  async canManageGuild(userId: string, guildId: string): Promise<boolean> {
+    const guilds = await this.getManageableGuilds(userId);
+    return guilds.some((g) => g.id === guildId);
   }
 
   private hashToken(token: string): string {

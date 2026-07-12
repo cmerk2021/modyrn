@@ -3,7 +3,6 @@ import { eq, guilds, type Database, type Guild } from '@modyrn/database';
 import type { ComplexityMode } from '@modyrn/shared';
 import { InjectDatabase } from '../database/inject-database.decorator.js';
 import { AuthService } from '../auth/auth.service.js';
-import { DiscordOAuthService } from '../auth/discord-oauth.service.js';
 import { DiscordRestService } from '../discord/discord-rest.service.js';
 import type { UpdateGuildSettingsDto } from './dto/update-guild-settings.dto.js';
 
@@ -37,18 +36,12 @@ export class GuildsService {
   constructor(
     @InjectDatabase() private readonly db: Database,
     private readonly auth: AuthService,
-    private readonly discord: DiscordOAuthService,
     private readonly rest: DiscordRestService,
   ) {}
 
   /** Lists guilds the user can manage, annotated with Modyrn install state. */
   async listManageable(userId: string): Promise<ManageableGuild[]> {
-    const accessToken = await this.auth.getAccessToken(userId);
-    if (!accessToken) return [];
-
-    const discordGuilds = (await this.discord.fetchGuilds(accessToken)).filter((g) =>
-      this.discord.canManageGuild(g),
-    );
+    const discordGuilds = await this.auth.getManageableGuilds(userId);
 
     const installed = await this.db.select().from(guilds);
     const installedById = new Map(installed.map((g) => [g.id, g]));
@@ -69,12 +62,10 @@ export class GuildsService {
 
   /**
    * Verifies the user can manage the guild. Throws {@link ForbiddenException}
-   * otherwise. Returns the set of manageable guild IDs for reuse.
+   * otherwise. Uses the cached guild list so it doesn't hit Discord per request.
    */
   async assertAccess(userId: string, guildId: string): Promise<void> {
-    const accessToken = await this.auth.getAccessToken(userId);
-    const discordGuilds = accessToken ? await this.discord.fetchGuilds(accessToken) : [];
-    const canManage = discordGuilds.some((g) => g.id === guildId && this.discord.canManageGuild(g));
+    const canManage = await this.auth.canManageGuild(userId, guildId);
     if (!canManage) {
       throw new ForbiddenException('You do not have access to manage this guild.');
     }

@@ -76,12 +76,7 @@ export class AuthController {
   /** Returns the current user along with the guilds they can manage. */
   @Get('me')
   async me(@CurrentUser() user: AuthenticatedUser) {
-    const accessToken = await this.auth.getAccessToken(user.id);
-    const guilds = accessToken
-      ? (await this.discord.fetchGuilds(accessToken))
-          .filter((g) => this.discord.canManageGuild(g))
-          .map((g) => ({ id: g.id, name: g.name, icon: g.icon, owner: g.owner }))
-      : [];
+    const guilds = await this.auth.getManageableGuilds(user.id);
 
     return {
       user: {
