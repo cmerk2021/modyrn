@@ -4,6 +4,7 @@ import {
   desc,
   emergencyStates,
   eq,
+  guilds,
   quarantineProfiles,
   type Database,
   type EmergencyStateRow,
@@ -64,9 +65,22 @@ export class EmergencyService {
     return this.patchState(guildId, { invitesRestricted: restricted }, userId);
   }
 
-  /** Locks or unlocks every text channel for @everyone (server freeze). */
+  /**
+   * Resolves the role whose SEND_MESSAGES permission lock/freeze should toggle.
+   * Uses the configured member role when set (correct for servers gated behind
+   * a member role), otherwise `@everyone` (whose ID equals the guild ID).
+   */
+  private async resolveLockRoleId(guildId: string): Promise<string> {
+    const [guild] = await this.db.select().from(guilds).where(eq(guilds.id, guildId)).limit(1);
+    return guild?.settings.memberRoleId || guildId;
+  }
+
+  /** Locks or unlocks every text channel for the member role (server freeze). */
   async setChatFrozen(guildId: string, frozen: boolean, userId: string) {
-    const channels = await this.rest.listChannels(guildId);
+    const [channels, roleId] = await Promise.all([
+      this.rest.listChannels(guildId),
+      this.resolveLockRoleId(guildId),
+    ]);
     const textChannels = channels.filter(
       (c) => c.type === RestChannelType.GuildText || c.type === RestChannelType.GuildAnnouncement,
     );
@@ -74,7 +88,7 @@ export class EmergencyService {
       textChannels.map((c) =>
         this.rest.setChannelSendPermission(
           c.id,
-          guildId,
+          roleId,
           !frozen,
           `Chat ${frozen ? 'freeze' : 'unfreeze'} by ${userId}`,
         ),
@@ -83,11 +97,12 @@ export class EmergencyService {
     return this.patchState(guildId, { chatFrozen: frozen, serverLocked: frozen }, userId);
   }
 
-  /** Locks or unlocks a single channel for @everyone. */
-  async setChannelLock(_guildId: string, channelId: string, locked: boolean, userId: string) {
+  /** Locks or unlocks a single channel for the member role. */
+  async setChannelLock(guildId: string, channelId: string, locked: boolean, userId: string) {
+    const roleId = await this.resolveLockRoleId(guildId);
     await this.rest.setChannelSendPermission(
       channelId,
-      _guildId,
+      roleId,
       !locked,
       `Channel ${locked ? 'lock' : 'unlock'} by ${userId}`,
     );

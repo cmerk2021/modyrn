@@ -19,6 +19,11 @@ export class UpdateGuildSettingsDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(20)
+  memberRoleId?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(64)
   timezone?: string;
 

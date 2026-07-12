@@ -5,7 +5,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 
 export interface ActivityPoint {
   label: string;
-  messages: number;
+  automod: number;
   cases: number;
 }
 
@@ -19,13 +19,15 @@ export function ActivityChart({ data }: ActivityChartProps) {
     <Card className="col-span-full lg:col-span-2">
       <CardHeader>
         <CardTitle className="text-base">Activity</CardTitle>
-        <CardDescription>Messages and moderation cases over the last 14 days.</CardDescription>
+        <CardDescription>
+          Moderation cases and automod events over the last 14 days.
+        </CardDescription>
       </CardHeader>
       <div className="h-64 px-2 pb-4">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 8, right: 16, left: -16, bottom: 0 }}>
             <defs>
-              <linearGradient id="fillMessages" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillAutomod" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="var(--color-primary)" stopOpacity={0.35} />
                 <stop offset="100%" stopColor="var(--color-primary)" stopOpacity={0} />
               </linearGradient>
@@ -58,10 +60,10 @@ export function ActivityChart({ data }: ActivityChartProps) {
             />
             <Area
               type="monotone"
-              dataKey="messages"
+              dataKey="automod"
               stroke="var(--color-primary)"
               strokeWidth={2}
-              fill="url(#fillMessages)"
+              fill="url(#fillAutomod)"
             />
             <Area
               type="monotone"

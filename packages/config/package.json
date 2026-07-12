@@ -1,6 +1,6 @@
 {
   "name": "@modyrn/config",
-  "version": "0.2.2",
+  "version": "0.3.1",
   "private": true,
   "description": "Shared build, lint and TypeScript configuration for Modyrn.",
   "license": "AGPL-3.0-only",

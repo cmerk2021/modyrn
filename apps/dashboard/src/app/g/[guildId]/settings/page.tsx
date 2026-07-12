@@ -14,7 +14,12 @@ import { Switch } from '@/components/ui/switch';
 
 interface GuildRecord {
   complexityMode: ComplexityMode;
-  settings: { modLogChannelId?: string; quarantineRoleId?: string; dmOnAction?: boolean };
+  settings: {
+    modLogChannelId?: string;
+    quarantineRoleId?: string;
+    memberRoleId?: string;
+    dmOnAction?: boolean;
+  };
 }
 interface Meta {
   roles: { id: string; name: string }[];
@@ -29,6 +34,7 @@ export default function SettingsPage() {
   const [complexity, setComplexity] = useState<ComplexityMode>('simple');
   const [modLog, setModLog] = useState('');
   const [quarantineRole, setQuarantineRole] = useState('');
+  const [memberRole, setMemberRole] = useState('');
   const [dmOnAction, setDmOnAction] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -38,6 +44,7 @@ export default function SettingsPage() {
       setComplexity(guild.data.complexityMode);
       setModLog(guild.data.settings.modLogChannelId ?? '');
       setQuarantineRole(guild.data.settings.quarantineRoleId ?? '');
+      setMemberRole(guild.data.settings.memberRoleId ?? '');
       setDmOnAction(Boolean(guild.data.settings.dmOnAction));
     }
   }, [guild.data]);
@@ -52,6 +59,7 @@ export default function SettingsPage() {
           complexityMode: complexity,
           modLogChannelId: modLog,
           quarantineRoleId: quarantineRole,
+          memberRoleId: memberRole,
           dmOnAction,
         }),
       });
@@ -122,6 +130,29 @@ export default function SettingsPage() {
                   </option>
                 ))}
             </Select>
+          </div>
+
+          <div>
+            <Label>Member role</Label>
+            <Select
+              className="mt-1"
+              value={memberRole}
+              onChange={(e) => setMemberRole(e.target.value)}
+            >
+              <option value="">@everyone (default)</option>
+              {meta.data?.roles
+                .filter((r) => r.name !== '@everyone')
+                .map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+            </Select>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Used by emergency actions (freeze chat, lock channel) to toggle send permissions. Pick
+              the role members use to talk if your server is gated behind one; otherwise leave as
+              @everyone.
+            </p>
           </div>
 
           <div className="border-border flex items-center justify-between rounded-md border p-3">

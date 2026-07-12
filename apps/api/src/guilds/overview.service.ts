@@ -14,11 +14,12 @@ import {
 import { HealthStatus, type ModerationActionType, type OverviewMetrics } from '@modyrn/shared';
 import { InjectDatabase } from '../database/inject-database.decorator.js';
 import { DatabaseService } from '../database/database.module.js';
+import { DiscordRestService } from '../discord/discord-rest.service.js';
 import { REDIS } from '../redis/redis.module.js';
 
 export interface ActivityPoint {
   label: string;
-  messages: number;
+  automod: number;
   cases: number;
 }
 
@@ -46,6 +47,7 @@ export class OverviewService {
   constructor(
     @InjectDatabase() private readonly db: Database,
     private readonly database: DatabaseService,
+    private readonly rest: DiscordRestService,
     @Inject(REDIS) private readonly redis: Redis,
   ) {}
 
@@ -53,29 +55,20 @@ export class OverviewService {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
-    const [
-      memberCount,
-      casesToday,
-      automodToday,
-      gatewayLatencyMs,
-      apiLatencyMs,
-      redisUp,
-      onlineCount,
-      recent,
-    ] = await Promise.all([
-      this.countMembers(guildId),
-      this.countCasesSince(guildId, startOfToday),
-      this.countAutomodSince(guildId, startOfToday),
-      this.gatewayLatency(),
-      this.apiLatency(),
-      this.redisUp(),
-      this.onlineCount(guildId),
-      this.recentCases(guildId),
-    ]);
+    const [counts, casesToday, automodToday, gatewayLatencyMs, apiLatencyMs, redisUp, recent] =
+      await Promise.all([
+        this.guildCounts(guildId),
+        this.countCasesSince(guildId, startOfToday),
+        this.countAutomodSince(guildId, startOfToday),
+        this.gatewayLatency(),
+        this.apiLatency(),
+        this.redisUp(),
+        this.recentCases(guildId),
+      ]);
 
     const metrics: OverviewMetrics = {
-      memberCount,
-      onlineCount,
+      memberCount: counts.memberCount,
+      onlineCount: counts.onlineCount,
       casesToday,
       automodEventsToday: automodToday,
       gatewayLatencyMs,
@@ -91,12 +84,27 @@ export class OverviewService {
     };
   }
 
-  private async countMembers(guildId: string): Promise<number> {
-    const [row] = await this.db
-      .select({ value: count() })
-      .from(guildMembers)
-      .where(and(eq(guildMembers.guildId, guildId), eq(guildMembers.present, true)));
-    return row?.value ?? 0;
+  /**
+   * Member and online counts sourced from Discord (with_counts), which is
+   * accurate and immediate. Falls back to the local member cache if the Discord
+   * call fails.
+   */
+  private async guildCounts(
+    guildId: string,
+  ): Promise<{ memberCount: number; onlineCount: number }> {
+    try {
+      const guild = await this.rest.getGuild(guildId);
+      return {
+        memberCount: guild.approximate_member_count ?? 0,
+        onlineCount: guild.approximate_presence_count ?? 0,
+      };
+    } catch {
+      const [row] = await this.db
+        .select({ value: count() })
+        .from(guildMembers)
+        .where(and(eq(guildMembers.guildId, guildId), eq(guildMembers.present, true)));
+      return { memberCount: row?.value ?? 0, onlineCount: 0 };
+    }
   }
 
   private async countCasesSince(guildId: string, since: Date): Promise<number> {
@@ -142,11 +150,6 @@ export class OverviewService {
     }
   }
 
-  private async onlineCount(guildId: string): Promise<number> {
-    const raw = await this.redis.get(`modyrn:guild:${guildId}:online`);
-    return raw ? Number(raw) : 0;
-  }
-
   private async recentCases(guildId: string): Promise<TimelineCase[]> {
     const rows = await this.db
       .select()
@@ -166,10 +169,38 @@ export class OverviewService {
   }
 
   private async activitySeries(guildId: string): Promise<ActivityPoint[]> {
-    // Derived from daily analytics snapshots when present; otherwise an empty
-    // series so the chart renders gracefully.
-    const points: ActivityPoint[] = [];
-    void guildId;
-    return points;
+    const since = new Date(Date.now() - 14 * 86_400_000);
+    const [caseRows, automodRows] = await Promise.all([
+      this.db
+        .select({ createdAt: cases.createdAt })
+        .from(cases)
+        .where(and(eq(cases.guildId, guildId), gte(cases.createdAt, since))),
+      this.db
+        .select({ createdAt: automodEvents.createdAt })
+        .from(automodEvents)
+        .where(and(eq(automodEvents.guildId, guildId), gte(automodEvents.createdAt, since))),
+    ]);
+
+    const casesByDay = new Map<string, number>();
+    const automodByDay = new Map<string, number>();
+    for (let i = 13; i >= 0; i--) {
+      const key = new Date(Date.now() - i * 86_400_000).toISOString().slice(0, 10);
+      casesByDay.set(key, 0);
+      automodByDay.set(key, 0);
+    }
+    for (const row of caseRows) {
+      const key = row.createdAt.toISOString().slice(0, 10);
+      if (casesByDay.has(key)) casesByDay.set(key, (casesByDay.get(key) ?? 0) + 1);
+    }
+    for (const row of automodRows) {
+      const key = row.createdAt.toISOString().slice(0, 10);
+      if (automodByDay.has(key)) automodByDay.set(key, (automodByDay.get(key) ?? 0) + 1);
+    }
+
+    return [...casesByDay.entries()].map(([day, caseCount]) => ({
+      label: day.slice(5),
+      automod: automodByDay.get(day) ?? 0,
+      cases: caseCount,
+    }));
   }
 }

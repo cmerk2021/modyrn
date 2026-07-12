@@ -11,6 +11,13 @@ export interface GuildSettings {
   modLogChannelId?: string;
   /** Role applied to quarantined members by the default `/quarantine` action. */
   quarantineRoleId?: string;
+  /**
+   * The role that normally grants members the ability to speak. Emergency
+   * actions (freeze chat, lock channel) override permissions on this role
+   * instead of `@everyone`, which is correct for servers gated behind a member
+   * role. Falls back to `@everyone` when unset.
+   */
+  memberRoleId?: string;
   /** Timezone used when rendering scheduled content, e.g. "Europe/London". */
   timezone?: string;
   /** Default DM-on-action behavior for moderation. */

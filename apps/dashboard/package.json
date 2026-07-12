@@ -1,6 +1,6 @@
 {
   "name": "@modyrn/dashboard",
-  "version": "0.2.2",
+  "version": "0.3.1",
   "private": true,
   "description": "Modyrn dashboard — the product. A fast, beautiful moderation control plane.",
   "license": "AGPL-3.0-only",

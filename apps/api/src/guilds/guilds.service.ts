@@ -116,6 +116,7 @@ export class GuildsService {
       ...guild.settings,
       ...(dto.modLogChannelId !== undefined ? { modLogChannelId: dto.modLogChannelId } : {}),
       ...(dto.quarantineRoleId !== undefined ? { quarantineRoleId: dto.quarantineRoleId } : {}),
+      ...(dto.memberRoleId !== undefined ? { memberRoleId: dto.memberRoleId } : {}),
       ...(dto.timezone !== undefined ? { timezone: dto.timezone } : {}),
       ...(dto.dmOnAction !== undefined ? { dmOnAction: dto.dmOnAction } : {}),
     };
